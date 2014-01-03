@@ -18,6 +18,7 @@ Example:
 
 ```
 > git clone https://github.com/vzsg/prohardver-push-notifier.git
+> cd prohardver-push-notifier
 > npm install
 > export PROHARDVER_USER=thisisjustin@example.com
 > export PROHARDVER_PASSWORD=thisismypassword
