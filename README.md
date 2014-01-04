@@ -25,7 +25,7 @@ var Configuration = {
             'username': 'Your Prohardver username',   // !!! Fill it
             'password': 'Your Prohardver password',   // !!! Fill it
             'checkInterval': 10,                      // in minutes
-            'format': 'list',                         // count or list
+            'format': 'list',                         // count, list or urls
             'notifyTo': 'all'                         // not implemented yet
         }
     ],

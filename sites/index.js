@@ -1,5 +1,6 @@
 /* global setTimeout */
 var Async = require('async'),
+    when = require('when'),
     PushBullet = require('../lib/pushbullet'),
     errors = require('../lib/errorHandling'),
     workers = {};
@@ -17,6 +18,16 @@ var sendNotification = function(results, options) {
             options.name,
             results.count.template.replace(/%d/, results.count.value)
         );
+    }
+
+    if (options.format === "urls") {
+        return when.all(results.urls.map(function (item) {
+            return PushBullet.broadcast.link(
+                options.name,
+                [item.title, '-', item.message].join(' '),
+                item.url
+            );
+        }));
     }
 };
 
