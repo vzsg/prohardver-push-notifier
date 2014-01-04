@@ -28,7 +28,7 @@ var Configuration = {
             'notifyTo': 'all'  // or iden list (not implemented yet)
         }
     ],
-    PushBulletApiKey: 'Your PushBullet API key'
+    PushBulletApiKey: 'Your PushBullet API key'       // <<< Fill it
 };
 ```
 
