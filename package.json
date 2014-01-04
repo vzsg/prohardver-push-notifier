@@ -5,11 +5,15 @@
   "main": "phusher.js",
   "dependencies": {
     "cheerio": "~0.13.0",
-    "request": "~2.30.0"
+    "request": "~2.30.0",
+    "when": "~2.7.1",
+    "underscore": "~1.5.2",
+    "colors": "~0.6.2",
+    "async": "~0.2.9"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "phusher.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +26,13 @@
     "forum"
   ],
   "author": "Zsolt Varadi <zsolt.varadi@outlook.com>",
+  "contributors": [
+    {
+      "name": "Balazs Nadasdi",
+      "email": "yitsushi@gmail.com",
+      "url": "http://balazsnadasdi.me/"
+    }
+  ],
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/vzsg/prohardver-push-notifier/issues"
