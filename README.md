@@ -21,14 +21,14 @@ var Configuration = {
     EnabledSites: [
         {
             'name': 'prohardver',
-            'username': 'Your Prohardver username',   // <<< Fill it
-            'password': 'Your Prohardver password',   // <<< Fill it
-            'checkInterval': 10, // In minutes
-            'format': 'list',
-            'notifyTo': 'all'  // or iden list (not implemented yet)
+            'username': 'Your Prohardver username',   // !!! Fill it
+            'password': 'Your Prohardver password',   // !!! Fill it
+            'checkInterval': 10,                      // in minutes
+            'format': 'list',                         // count or list
+            'notifyTo': 'all'                         // not implementes yet
         }
     ],
-    PushBulletApiKey: 'Your PushBullet API key'       // <<< Fill it
+    PushBulletApiKey: 'Your PushBullet API key'       // !!! Fill it
 };
 ```
 
