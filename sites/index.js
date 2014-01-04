@@ -15,7 +15,7 @@ var sendNotification = function(results, options) {
     if (options.format === "count") {
         return PushBullet.broadcast.note(
             options.name,
-            results.count.template.replace(/%s/, results.count.value)
+            results.count.template.replace(/%d/, results.count.value)
         );
     }
 };
