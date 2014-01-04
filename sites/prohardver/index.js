@@ -71,27 +71,15 @@ module.exports.worker = function(done) {
 
             threads = distinctUrl(threads);
 
-            totalMessages = threads.reduce(function (prev, item) {
-                return prev + item.count;
-            }, 0);
-
-            messagesPerThread = threads.map(function (th) {
-                return [th.title, '-', th.message].join(' ');
-            });
-
-            if (totalMessages === 0) {
+            if (!threads || !threads.length) {
                 return done(null, false);
             }
 
             done(
                 null,
                 {
-                    count: {
-                        template: "%d új hozzászólás érkezett",
-                        value: totalMessages
-                    },
-                    list: messagesPerThread,
-                    urls: threads
+                    template: "%d új hozzászólás érkezett",
+                    list: threads
                 }
             );
         }

@@ -9,19 +9,25 @@ var sendNotification = function(results, options) {
     if (options.format === "list") {
         return PushBullet.broadcast.list(
             options.name,
-            results.list
+            results.list.map(function (th) {
+                return [th.title, '-', th.message].join(' ');
+            })
         );
     }
     
     if (options.format === "count") {
+        var count = results.list.reduce(function (prev, item) {
+                return prev + item.count;
+        }, 0);
+
         return PushBullet.broadcast.note(
             options.name,
-            results.count.template.replace(/%d/, results.count.value)
+            results.template.replace(/%d/, count)
         );
     }
 
     if (options.format === "urls") {
-        return when.all(results.urls.map(function (item) {
+        return when.all(results.list.map(function (item) {
             return PushBullet.broadcast.link(
                 options.name,
                 [item.title, '-', item.message].join(' '),
