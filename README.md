@@ -8,20 +8,39 @@ How to use:
 
 1. Clone this repository to your target system.
 2. Run 'npm install' to install dependencies.
-3. Set your Prohardver! and PushBullet credentials in environment variables.
-4. (Optional) set message format and polling interval.
-5. Run with 'node phusher.js'.
+3. Cony `config.example.js` to `config.js` _(or try to run the application)_
+3. Set your Prohardver! and PushBullet credentials in `config.js`.
+4. _(Optional)_ Set message format and polling interval.
+5. Run with `node index.js`.
+
+Configuration File:
+-------------------
+
+```
+var Configuration = {
+    EnabledSites: [
+        {
+            'name': 'prohardver',
+            'username': 'Your Prohardver username',   // <<< Fill it
+            'password': 'Your Prohardver password',   // <<< Fill it
+            'checkInterval': 10, // In minutes
+            'format': 'list',
+            'notifyTo': 'all'  // or iden list (not implemented yet)
+        }
+    ],
+    PushBulletApiKey: 'Your PushBullet API key'
+};
+```
 
 Example:
 --------
 
 ```
-> git clone https://github.com/vzsg/prohardver-push-notifier.git
+> git clone https://github.com/Yitsushi/prohardver-push-notifier.git
 > npm install
-> export PROHARDVER_USER=thisisjustin@example.com
-> export PROHARDVER_PASSWORD=thisismypassword
-> export PUSHBULLET_APIKEY=v10KA...
-> export PROHARDVER_MESSAGE_FORMAT=note  # the default is "list"
-> export PROHARDVER_CHECK_INTERVAL=20  # minutes, the default is 10
-> node phusher.js
+> cp config.example.js config.js
+
+Edit `config.js`.
+
+> node index.js
 ```
