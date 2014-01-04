@@ -38,6 +38,7 @@ Example:
 
 ```
 > git clone https://github.com/vzsg/prohardver-push-notifier.git
+> cd prohardver-push-notifier
 > npm install
 > cp config.example.js config.js
 
