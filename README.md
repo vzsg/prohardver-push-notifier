@@ -11,7 +11,7 @@ How to use:
 2. Run 'npm install' to install dependencies.
 3. Copy `config.example.js` to `config.js` _(or try to run the application)_
 3. Set your Prohardver! and PushBullet credentials in `config.js`.
-4. _(Optional)_ Set message format and polling interval.
+4. _(Optional)_ Set message format, polling interval and PH! flavor (subsite).
 5. Run with `node index.js` or forever.
 
 Configuration File:
@@ -22,10 +22,12 @@ var Configuration = {
     EnabledSites: [
         {
             'name': 'prohardver',
-            'username': 'Your Prohardver username',   // !!! Fill it
-            'password': 'Your Prohardver password',   // !!! Fill it
+            'username': 'Your Prohardver username',   // important!
+            'password': 'Your Prohardver password',   // important!
             'checkInterval': 10,                      // in minutes
             'format': 'list',                         // count, list or urls
+            'subsite': 'prohardver',                  // PH subsite to use in URLs
+            'mobile': false,                          // true if you want mobile-friendly URLs
             'notifyTo': 'all'                         // not implemented yet
         }
     ],

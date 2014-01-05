@@ -1,5 +1,33 @@
 module.exports.name = "Prohardver! fórum";
 
+var subsites = {
+    prohardver: {
+        name: 'PROHARDVER! fórum',
+        desktopPrefix: 'http://prohardver.hu',
+        mobilePrefix: 'http://m.prohardver.hu'
+    },
+    mobilarena: {
+        name: 'Mobilarena fórum',
+        desktopPrefix: 'http://mobilarena.hu',
+        mobilePrefix: 'http://m.mobilarena.hu'
+    },
+    itcafe: {
+        name: 'IT café Fórum',
+        desktopPrefix: 'http://itcafe.hu',
+        mobilePrefix: 'http://m.itcafe.hu'
+    },
+    logout: {
+        name: 'LOGOUT.hu Fórum',
+        desktopPrefix: 'http://logout.hu',
+        mobilePrefix: 'http://m.logout.hu'
+    },
+    gamepod: {
+        name: 'GAMEPOD.hu Fórum',
+        desktopPrefix: 'http://gamepod.hu',
+        mobilePrefix: 'http://m.gamepod.hu'
+    },
+};
+
 var Config = false,
     Request = require('request'),
     Cheerio = require('cheerio'),
@@ -7,7 +35,8 @@ var Config = false,
     loginUrl = 'http://mobilarena.hu/muvelet/hozzaferes/belepes.php',
     url = 'http://mobilarena.hu/forum/index.html',
     jar = Request.jar(),
-    loginForm;
+    loginForm,
+    prefix;
 
 var distinctUrl = function(a) {
     return a.reduce(function(p, c) {
@@ -28,6 +57,16 @@ module.exports.init = function(config, done) {
         no_ip_check: '1',
         leave_others: '1'
     };
+
+    if (!!Config.subsite && !subsites[Config.subsite]) {
+        console.log('WARN: subsite "' + Config.subsite + '" not found, defaulting to prohardver');
+        Config.subsite = 'prohardver';    
+    }
+
+    module.exports.name = subsites[Config.subsite].name;
+    prefix = Config.mobile
+                ? subsites[Config.subsite].mobilePrefix
+                : subsites[Config.subsite].desktopPrefix;
 
     return Request.post(
         loginUrl,
@@ -55,15 +94,13 @@ module.exports.worker = function(done) {
             }
 
             var $ = Cheerio.load(body),
-                threads = [],
-                totalMessages,
-                messagesPerThread;
+                threads = [];
 
             $('div.usstuff a.msgs').each(function () {
                 var $count = $(this);
                 threads.push({
                     count: Number($count.text().trim()),
-                    url: 'http://prohardver.hu' + $count.attr('href'),
+                    url: (prefix || 'http://prohardver.hu')  + $count.attr('href'),
                     title: $count.parent().prev().text().trim(),
                     message: $count.attr('title')
                 });
