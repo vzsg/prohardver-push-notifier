@@ -11,7 +11,7 @@ How to use:
 2. Run 'npm install' to install dependencies.
 3. Copy `config.example.js` to `config.js` _(or try to run the application)_
 3. Set your Prohardver! and PushBullet credentials in `config.js`.
-4. _(Optional)_ Set message format, polling interval and PH! flavor (subsite).
+4. _(Optional)_ Configute optional parameters, like message format, polling interval and PH! flavor (subsite).
 5. Run with `node index.js` or forever.
 
 Configuration File:
@@ -28,7 +28,7 @@ var Configuration = {
             'format': 'list',                         // count, list or urls
             'subsite': 'prohardver',                  // PH subsite to use in URLs
             'mobile': false,                          // true if you want mobile-friendly URLs
-            'notifyTo': 'all'                         // not implemented yet
+            'notifyTo': 'all'                         // replace with a single or an array of device idens for selective sending
         }
     ],
     PushBulletApiKey: 'Your PushBullet API key'       // !!! Fill it

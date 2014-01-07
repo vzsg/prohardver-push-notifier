@@ -11,7 +11,8 @@ var sendNotification = function(results, options) {
             options.name,
             results.list.map(function (th) {
                 return [th.title, '-', th.message].join(' ');
-            })
+            }),
+            options.target
         );
     }
     
@@ -22,7 +23,8 @@ var sendNotification = function(results, options) {
 
         return PushBullet.broadcast.note(
             options.name,
-            results.template.replace(/%d/, count)
+            results.template.replace(/%d/, count),
+            options.target
         );
     }
 
@@ -31,7 +33,8 @@ var sendNotification = function(results, options) {
             return PushBullet.broadcast.link(
                 options.name,
                 item.title,
-                item.url
+                item.url,
+                options.target
             );
         }));
     }
@@ -91,7 +94,8 @@ module.exports = function(enabledSites) {
                         options: {
                             interval: enabled.checkInterval * 1000 * 60,
                             format: enabled.format,
-                            name: site.name
+                            name: site.name,
+                            target: enabled.notifyTo
                         },
                         worker: site.worker
                     }
