@@ -4,6 +4,7 @@
  *     username, password
  *     subsite
  *     mobile
+ *     favoriteThreadsOnly
  *
  * Available formats:
  *   list
@@ -21,7 +22,8 @@ var Configuration = {
             'format': 'urls',
             'notifyTo': 'all',
             'subsite': 'prohardver',
-            'mobile': false
+            'mobile': false,
+            'includeRecent': false
         }
     ],
     PushBulletApiKey: 'Your PushBullet API key'

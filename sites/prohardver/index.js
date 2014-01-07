@@ -37,7 +37,8 @@ var Config = false,
     url = 'http://mobilarena.hu/forum/index.html',
     jar = Request.jar(),
     loginForm,
-    prefix;
+    prefix,
+    threadSelector;
 
 var distinctUrl = function(a) {
     return a.reduce(function(p, c) {
@@ -69,6 +70,8 @@ module.exports.init = function(config, done) {
                 ? subsites[Config.subsite].mobilePrefix
                 : subsites[Config.subsite].desktopPrefix;
 
+    threadSelector = Config.includeRecent ? 'div.usstuff a.msgs' : 'div.usfavs a.msgs';
+    
     return Request.post(
         loginUrl,
         {
@@ -97,7 +100,7 @@ module.exports.worker = function(done) {
             var $ = Cheerio.load(body),
                 threads = [];
 
-            $('div.usstuff a.msgs').each(function () {
+            $(threadSelector).each(function () {
                 var $count = $(this);
                 threads.push({
                     count: Number($count.text().trim()),
