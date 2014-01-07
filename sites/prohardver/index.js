@@ -32,13 +32,15 @@ var Config = false,
     Request = require('request'),
     Cheerio = require('cheerio'),
     errorHandling = require('../../lib/errorHandling.js'),
+    LRU = require('lru-cache'),
 
     loginUrl = 'http://mobilarena.hu/muvelet/hozzaferes/belepes.php',
     url = 'http://mobilarena.hu/forum/index.html',
     jar = Request.jar(),
     loginForm,
     prefix,
-    threadSelector;
+    threadSelector,
+    urlCache = new LRU(100);
 
 var distinctUrl = function(a) {
     return a.reduce(function(p, c) {
@@ -47,6 +49,18 @@ var distinctUrl = function(a) {
         }
         return p;
     }, []);
+};
+
+var filterAlreadyNotified = function (threads, cache) {
+    var result = threads.filter(function (url) {
+       return cache.get(url) !== 1; 
+    });
+                
+    result.forEach(function(url) {
+        cache.set(url, 1);            
+    });
+
+    return result;    
 };
 
 module.exports.init = function(config, done) {
@@ -111,6 +125,10 @@ module.exports.worker = function(done) {
             });
 
             threads = distinctUrl(threads);
+
+            if (Config.format === 'urls') {
+                threads = filterAlreadyNotified(threads, urlCache);
+            }
 
             if (!threads || !threads.length) {
                 return done(null, false);
