@@ -30,7 +30,7 @@ var sendNotification = function(results, options) {
         return when.all(results.list.map(function (item) {
             return PushBullet.broadcast.link(
                 options.name,
-                [item.title, '-', item.message].join(' '),
+                item.title,
                 item.url
             );
         }));
