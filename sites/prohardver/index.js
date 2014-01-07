@@ -31,6 +31,7 @@ var subsites = {
 var Config = false,
     Request = require('request'),
     Cheerio = require('cheerio'),
+    errorHandling = require('../../lib/errorHandling.js'),
 
     loginUrl = 'http://mobilarena.hu/muvelet/hozzaferes/belepes.php',
     url = 'http://mobilarena.hu/forum/index.html',
@@ -59,7 +60,7 @@ module.exports.init = function(config, done) {
     };
 
     if (!!Config.subsite && !subsites[Config.subsite]) {
-        console.log('WARN: subsite "' + Config.subsite + '" not found, defaulting to prohardver');
+        errorHandling.logWarn('subsite "' + Config.subsite + '" not found, defaulting to prohardver');
         Config.subsite = 'prohardver';    
     }
 
