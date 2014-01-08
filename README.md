@@ -48,3 +48,53 @@ Edit `config.js`.
 
 > node index.js
 ```
+
+Hungarian FAQ for beginners (GYIK):
+-----------------------------------
+
+Csendes indítás Node.js forever:
+
+Telepíteni kell a forever csomagot:
+```
+> $ npm install forever
+```
+Indítsd el:
+```
+> $ forever start index.js
+```
+
+Csendes indítás init.d script segítségével:
+
+Írd át ezt a scriptet: http://goo.gl/Eg7Ebc így:
+```
+NODE_EXEC= /opt/node/bin/node  // node bináris útvonala, "which node" megmondja hol van
+NODE_ENV= "production"          // kihagyható
+NODE_APP='index.js'
+PID_FILE=$APP_DIR/pid/app.pid
+LOG_FILE=$APP_DIR/log/app.log
+APP_DIR='<phusher_könyvtárához_teljes_útvonal>'
+CONFIG_DIR=$APP_DIR
+```
+
+Mentsd el az /etc/init.d/<script_neve> helyre root joggal, majd:
+```
+> $ sudo update-rc.d <script_neve> defaults
+```
+
+Lépj be az index.js könyvtárába, és hozd létre a szükséges log fájlokat:
+```
+$ mkdir /pid
+$ mkdir /log
+$ nano /pid/app.pid
+$ nano /log/app.log
+```
+
+Ezután indíthatod:
+```
+$ sudo /etc/init.d/<script_neve> <stop|start|restart|status>
+```
+
+Ha nem akarod, hogy reboot után a géppel induljon, akkor:
+```
+$ sudo update-rc.d -f <script_neve> remove
+```
