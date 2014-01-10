@@ -6,38 +6,14 @@ var Async = require('async'),
     workers = {};
 
 var sendNotification = function(results, options) {
-    if (options.format === "list") {
-        return PushBullet.broadcast.list(
+    return when.all(results.list.map(function (item) {
+        return PushBullet.broadcast.link(
             options.name,
-            results.list.map(function (th) {
-                return [th.title, '-', th.message].join(' ');
-            }),
+            item.title,
+            item.url,
             options.target
         );
-    }
-    
-    if (options.format === "count") {
-        var count = results.list.reduce(function (prev, item) {
-                return prev + item.count;
-        }, 0);
-
-        return PushBullet.broadcast.note(
-            options.name,
-            results.template.replace(/%d/, count),
-            options.target
-        );
-    }
-
-    if (options.format === "urls") {
-        return when.all(results.list.map(function (item) {
-            return PushBullet.broadcast.link(
-                options.name,
-                item.title,
-                item.url,
-                options.target
-            );
-        }));
-    }
+    }));
 };
 
 var Iterate = function(action, options, id) {
@@ -93,7 +69,6 @@ module.exports = function(enabledSites) {
                         id: enabled.name,
                         options: {
                             interval: enabled.checkInterval * 1000 * 60,
-                            format: enabled.format,
                             name: site.name,
                             target: enabled.notifyTo
                         },

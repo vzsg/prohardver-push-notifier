@@ -40,7 +40,8 @@ var Config = false,
     loginForm,
     prefix,
     threadSelector,
-    urlCache = new LRU(100);
+    urlCache = new LRU(100),
+    lastPrivMsgCount;
 
 var distinctUrl = function(a) {
     return a.reduce(function(p, c) {
@@ -112,22 +113,32 @@ module.exports.worker = function(done) {
             }
 
             var $ = Cheerio.load(body),
-                threads = [];
+                threads = [],
+                $privMsg;
 
             $(threadSelector).each(function () {
                 var $count = $(this);
                 threads.push({
-                    count: Number($count.text().trim()),
-                    url: (prefix || 'http://prohardver.hu')  + $count.attr('href'),
-                    title: $count.parent().prev().text().trim(),
-                    message: $count.attr('title')
+                    url: (prefix || 'http://prohardver.hu') + $count.attr('href'),
+                    title: $count.parent().prev().text().trim()
                 });
             });
 
+            $privMsg = $('#right .listmenu li.act');
+            
             threads = distinctUrl(threads);
+            threads = filterAlreadyNotified(threads, urlCache);
 
-            if (Config.format === 'urls') {
-                threads = filterAlreadyNotified(threads, urlCache);
+            if ($privMsg.length) {
+                var count = $privMsg.find('b').text().replace(/[\(\)]/ig, '');
+                if (count !== lastPrivMsgCount) {
+                    threads.push({
+                        url: (prefix || 'http://prohardver.hu') + $privMsg.find('a').attr('href'),
+                        title: count + ' privát üzenet!'
+                    });
+                    
+                    lastPrivMsgCount = count;
+                }
             }
 
             if (!threads || !threads.length) {
@@ -137,7 +148,6 @@ module.exports.worker = function(done) {
             done(
                 null,
                 {
-                    template: "%d új hozzászólás érkezett",
                     list: threads
                 }
             );
