@@ -139,6 +139,8 @@ module.exports.worker = function(done) {
                     
                     lastPrivMsgCount = count;
                 }
+            } else {
+                lastPrivMsgCount = false;
             }
 
             if (!threads || !threads.length) {
