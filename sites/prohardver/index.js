@@ -53,12 +53,12 @@ var distinctUrl = function(a) {
 };
 
 var filterAlreadyNotified = function (threads, cache) {
-    var result = threads.filter(function (url) {
-       return cache.get(url) !== 1; 
+    var result = threads.filter(function (thread) {
+       return cache.get(thread.url) !== 1; 
     });
                 
-    result.forEach(function(url) {
-        cache.set(url, 1);            
+    result.forEach(function(thread) {
+        cache.set(thread.url, 1);            
     });
 
     return result;    
