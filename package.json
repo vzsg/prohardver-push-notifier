@@ -1,6 +1,6 @@
 {
   "name": "PHusher",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Web scraper and push notifier for new messages on the Prohardver! forums (www.prohardver.hu).",
   "main": "phusher.js",
   "dependencies": {
@@ -10,7 +10,8 @@
     "underscore": "~1.5.2",
     "colors": "~0.6.2",
     "async": "~0.2.9",
-    "lru-cache": "~2.5.0"
+    "lru-cache": "~2.5.0",
+    "pushbullet": "^0.4.0"
   },
   "devDependencies": {},
   "scripts": {

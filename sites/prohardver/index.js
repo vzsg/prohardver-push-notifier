@@ -67,6 +67,7 @@ var filterAlreadyNotified = function (threads, cache) {
 module.exports.init = function(config, done) {
     Config = config;
 
+    errorHandling.logInfo(['[PH] Initializing Prohardver! module for user "', config.username, '"'].join(""));
     loginForm = {
         login_email: Config.username,
         login_pass: Config.password,
@@ -87,6 +88,7 @@ module.exports.init = function(config, done) {
 
     threadSelector = Config.includeRecent ? 'div.usstuff a.msgs' : 'div.usfavs a.msgs';
     
+    errorHandling.logInfo('[PH] Logging in...');
     return Request.post(
         loginUrl,
         {
@@ -95,23 +97,28 @@ module.exports.init = function(config, done) {
         },
         function(err, resp, body) {
             if (err) {
+                errorHandling.logError(err, '[PH] Login failed!');
                 return done(null, false);
             }
 
+            errorHandling.logInfo('[PH] Login successful!');
             return done();
         }
     );
 };
 
 module.exports.worker = function(done) {
+    errorHandling.logInfo('[PH] Fetching forum main page...');
     return Request(
         url,
         { jar:  jar },
         function(err, resp, body) {
             if (err) {
+                errorHandling.logError(err, '[PH] Forum request failed!');
                 return done(null, false);
             }
 
+            errorHandling.logInfo('[PH] Forum main page downloaded!');
             var $ = Cheerio.load(body),
                 threads = [],
                 $privMsg;
@@ -144,9 +151,11 @@ module.exports.worker = function(done) {
             }
 
             if (!threads || !threads.length) {
-                return done(null, false);
+            errorHandling.logInfo('[PH] Nothing to broadcast.');
+            return done(null, false);
             }
 
+            errorHandling.logInfo(['[PH] Found ', threads.length, ' new threads!'].join(""));
             done(
                 null,
                 {
