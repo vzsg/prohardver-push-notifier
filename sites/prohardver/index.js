@@ -31,6 +31,7 @@ var subsites = {
 var Config = false,
     Request = require('request'),
     Cheerio = require('cheerio'),
+    when = require('when'),
     errorHandling = require('../../lib/errorHandling.js'),
     LRU = require('lru-cache'),
 
@@ -41,7 +42,8 @@ var Config = false,
     prefix,
     threadSelector,
     urlCache = new LRU(100),
-    lastPrivMsgCount;
+    lastPrivMsgCount,
+    loginCounter;
 
 var distinctUrl = function(a) {
     return a.reduce(function(p, c) {
@@ -64,6 +66,33 @@ var filterAlreadyNotified = function (threads, cache) {
     return result;    
 };
 
+var isLoggedIn = function($body) {
+    return $body('.usopts li').length != 3;
+}
+
+var login = function() {
+    var loggedIn = when.defer();
+    
+    errorHandling.logInfo('[PH] Logging in...');
+    
+    Request.post(
+        loginUrl,
+        {
+            form: loginForm,
+            jar:  jar
+        },
+        function(err, resp, body) {
+            if (err) {
+                loggedIn.reject(err);
+            }
+
+            loggedIn.resolve(body);
+        }
+    );
+    
+    return loggedIn.promise;
+}
+
 module.exports.init = function(config, done) {
     Config = config;
 
@@ -77,7 +106,7 @@ module.exports.init = function(config, done) {
     };
 
     if (!!Config.subsite && !subsites[Config.subsite]) {
-        errorHandling.logWarn('subsite "' + Config.subsite + '" not found, defaulting to prohardver');
+        errorHandling.logWarn('[PH] subsite "' + Config.subsite + '" not found, defaulting to prohardver');
         Config.subsite = 'prohardver';    
     }
 
@@ -86,82 +115,93 @@ module.exports.init = function(config, done) {
                 ? subsites[Config.subsite].mobilePrefix
                 : subsites[Config.subsite].desktopPrefix;
 
-    threadSelector = Config.includeRecent ? 'div.usstuff a.msgs' : 'div.usfavs a.msgs';
-    
-    errorHandling.logInfo('[PH] Logging in...');
-    return Request.post(
-        loginUrl,
-        {
-            form: loginForm,
-            jar:  jar
-        },
-        function(err, resp, body) {
-            if (err) {
-                errorHandling.logError(err, '[PH] Login failed!');
-                return done(null, false);
-            }
-
-            errorHandling.logInfo('[PH] Login successful!');
-            return done();
-        }
-    );
+    threadSelector = Config.includeRecent ? 'div.usstuff a.msgs' : 'div.usfavs a.msgs';    
+    return done();
 };
 
-module.exports.worker = function(done) {
+var fetchMainPage = function() {
+    var downloaded = when.defer();
+
     errorHandling.logInfo('[PH] Fetching forum main page...');
-    return Request(
-        url,
-        { jar:  jar },
-        function(err, resp, body) {
-            if (err) {
-                errorHandling.logError(err, '[PH] Forum request failed!');
-                return done(null, false);
-            }
-
-            errorHandling.logInfo('[PH] Forum main page downloaded!');
-            var $ = Cheerio.load(body),
-                threads = [],
-                $privMsg;
-
-            $(threadSelector).each(function () {
-                var $count = $(this);
-                threads.push({
-                    url: (prefix || 'http://prohardver.hu') + $count.attr('href'),
-                    title: $count.parent().prev().text().trim()
-                });
-            });
-
-            $privMsg = $('#right .listmenu li.act');
-            
-            threads = distinctUrl(threads);
-            threads = filterAlreadyNotified(threads, urlCache);
-
-            if ($privMsg.length) {
-                var count = $privMsg.find('b').text().replace(/[\(\)]/ig, '');
-                if (count !== lastPrivMsgCount) {
-                    threads.push({
-                        url: (prefix || 'http://prohardver.hu') + $privMsg.find('a').attr('href'),
-                        title: count + ' privát üzenet!'
-                    });
-                    
-                    lastPrivMsgCount = count;
-                }
-            } else {
-                lastPrivMsgCount = false;
-            }
-
-            if (!threads || !threads.length) {
-            errorHandling.logInfo('[PH] Nothing to broadcast.');
-            return done(null, false);
-            }
-
-            errorHandling.logInfo(['[PH] Found ', threads.length, ' new threads!'].join(""));
-            done(
-                null,
-                {
-                    list: threads
-                }
-            );
+    
+    Request(url, {jar: jar}, function (err, resp, body) {
+        if (err) {
+            downloaded.reject(err);
         }
-    );
+
+        downloaded.resolve(body);
+    });
+    
+    return downloaded.promise;
+}
+
+var parseBody = function(body) {
+    return Cheerio.load(body);
+}
+
+var assertLogin = function($body) {
+    if (isLoggedIn($body)) {
+        errorHandling.logInfo('[PH] Already logged in!');
+        return when.resolve($body);
+    }
+
+    if (loginCounter >= 3) {
+        return when.reject('[PH] Too many login attempts!');
+    }
+
+    loginCounter++;
+    return login().then(fetchMainPage).then(parseBody).then(assertLogin);
+}
+
+function collectNewThreads($) {
+    var threads = [], $privMsg;
+    
+    $(threadSelector).each(function () {
+        var $count = $(this);
+        threads.push({
+            url: (prefix || 'http://prohardver.hu') + $count.attr('href'),
+            title: $count.parent().prev().text().trim()
+        });
+    });
+
+    $privMsg = $('#right .listmenu li.act');
+    
+    threads = distinctUrl(threads);
+    threads = filterAlreadyNotified(threads, urlCache);
+
+    if ($privMsg.length) {
+        var count = $privMsg.find('b').text().replace(/[\(\)]/ig, '');
+        if (count !== lastPrivMsgCount) {
+            threads.push({
+                url: (prefix || 'http://prohardver.hu') + $privMsg.find('a').attr('href'),
+                title: count + ' privát üzenet!'
+            });
+            
+            lastPrivMsgCount = count;
+        }
+    } else {
+        lastPrivMsgCount = false;
+    }
+    
+    return when.resolve(threads);
+}
+
+module.exports.worker = function(done) {
+    loginCounter = 0;
+    fetchMainPage()
+    .then(parseBody)
+    .then(assertLogin)
+    .then(collectNewThreads)
+    .then(function (threads) {
+        if (!threads || !threads.length) {
+            errorHandling.logInfo('[PH] Nothing to broadcast.');
+            done(null, false);
+        } else {
+            errorHandling.logInfo(['[PH] Found ', threads.length, ' new thread(s)!'].join(""));
+            done(null, { list: threads });
+        }
+    }, function (fail) {
+        errorHandling.logError(fail);
+        done(null, false);
+    });
 };
