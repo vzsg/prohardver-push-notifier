@@ -11,7 +11,7 @@ How to use:
 2. Run 'npm install' to install dependencies.
 3. Copy `config.example.js` to `config.js` _(or try to run the application)_
 3. Set your Prohardver! and PushBullet credentials in `config.js`.
-4. _(Optional)_ Configute optional parameters, like polling interval, PH! flavor (subsite), mobile-friendly links.
+4. _(Optional)_ Configure optional parameters, like polling interval, PH! flavor (subsite), mobile-friendly links.
 5. Run with `node index.js` or forever.
 
 Configuration File:
@@ -48,10 +48,21 @@ Edit `config.js`.
 > node index.js
 ```
 
-Hungarian FAQ for beginners (GYIK):
------------------------------------
+Magyar gyorstalpaló:
+--------------------
 
-Csendes indítás Node.js forever:
+0. Telepítsd fel a`git`et és a Node.js-t a gépedre.
+1. Töltsd le a projekt forrását oda, ahonnan futtatni akarod. A klónozást lásd jobb oldalon.
+2. Menj ebbe a mappába, majd futtasd az `npm install` parancsot a szükséges csomagok letöltéséhez.
+3. Készítsz másolatot a `config.example.js`-ről `config.js` néven _(ezt az alkalmazás is megteszi első indításkor)_
+3. Állítsd be a Prohardver! felhasználóneved és jelszavad, valamint a PushBullet API kulcsodat a `config.js`-ben.
+4. _(Nem kötelező)_ Finomhangold a beállításokat: a pushokban leküldött PH! aloldalt; mobil- vagy normál fórumot; lekérdezések közötti időt; "Itt szóltam hozzá" topikok figyelését; vagy azt az eszközazonosítót*, amire a pushok mennek.
+5. Futtasd az alkalmazást a `node index.js` paranccsal, vagy a `forever` segítségével (lásd Sancho leírását alább).
+
+*: A lehetséges célpontokat indítás után kilistázza az alkalmazás.
+
+Csendes indítás Node.js forever segítségével (@sanchomuzax):
+------------------------------------------------------------
 
 Telepíteni kell a forever csomagot:
 ```
