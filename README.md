@@ -14,6 +14,8 @@ How to use:
 4. _(Optional)_ Configure optional parameters, like polling interval, PH! flavor (subsite), mobile-friendly links.
 5. Run with `node index.js` or forever.
 
+If you set the polling interval to 0, false or other "false" value, the program will stop after a single check.
+
 Configuration File:
 -------------------
 
@@ -24,7 +26,7 @@ var Configuration = {
             'name': 'prohardver',
             'username': 'Your Prohardver username',   // important!
             'password': 'Your Prohardver password',   // important!
-            'checkInterval': 10,                      // in minutes
+            'checkInterval': 10,                      // in minutes, set to 0 or false to disable periodic checks
             'subsite': 'prohardver',                  // PH subsite to use in URLs
             'mobile': false,                          // true if you want mobile-friendly URLs
             'notifyTo': 'all'                         // replace with a single or an array of device idens for selective sending
@@ -60,6 +62,8 @@ Magyar gyorstalpaló:
 5. Futtasd az alkalmazást a `node index.js` paranccsal, vagy a `forever` segítségével (lásd Sancho leírását alább).
 
 *: A lehetséges célpontokat indítás után kilistázza az alkalmazás.
+
+Ha a lekérdezési intervallum 0 vagy egyéb hamis érték, a program a lekérdezés után leáll.
 
 Csendes indítás Node.js forever segítségével (@sanchomuzax):
 ------------------------------------------------------------

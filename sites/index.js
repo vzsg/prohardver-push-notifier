@@ -30,14 +30,12 @@ var Iterate = function(action, options, id) {
 
             var wait = options.interval;
 
-            // Different check interval if no results (eg longer)
-            // useless yet
-            if (results === false) {
-                wait = options.interval;
-            } else if (results.length < 1) {
-                wait = options.interval;
+            if (!wait) {
+                errors.logInfo(['[SCH] Periodic checks disabled for ', id, ', stopping worker.'].join(''));
+                return false;
             }
-
+            
+            errors.logInfo(['[SCH] Site ', id, ' is sleeping for ', wait/60000, ' minutes...'].join(''));
             return setTimeout(function() {
                 return method(done);
             }, wait);
@@ -55,10 +53,11 @@ module.exports = function(enabledSites) {
             try {
                 site = require("./" + enabled.name);
             } catch (ignore) {
-                errors.logWarn("Site not found", enabled.name);
+                errors.logWarn("[SCH] Site not found: " + enabled.name);
             }
             if (site) {
                 if (!site.hasOwnProperty('init') || !site.hasOwnProperty('name') || !site.hasOwnProperty('worker')) {
+                    errors.logWarn("[SCH] Invalid site: " + enabled.name);
                     site = false;
                 }
             }
